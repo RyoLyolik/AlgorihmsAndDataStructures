@@ -34,6 +34,11 @@ class LinkedElement:
     def get_previous(self):
         return self.previous
 
+    def delete(self):
+        self.previous.next = self.next
+        self.next.previous = self.previous
+        del self
+
     def __repr__(self):
         return str(self.value)
 
@@ -50,22 +55,23 @@ class LinkedList:
         self.end.previous.next = element
         self.end.previous = element
 
-    def search(self, element):
+    def insert_start(self, val):
+        element = LinkedElement(val, self.start, self.start.next)
+        self.start.next.previous = element
+        self.start.next = element
+
+    def search(self, val) -> LinkedElement:
         s = self.start
         while not isinstance(s, EndPosition):
             s = s.next
-            if s.value == element:
+            if s.value == val:
                 return s
         return None
 
-    def delete_by_value(self, element):
-        el = self.search(element)
+    def delete(self, val):
+        el = self.search(val)
         if el is not None:
-            self.delete(el)
-    @staticmethod
-    def delete(el):
-        el.previous.next = el.next
-        el.next.previous = el.previous
+            el.delete()
 
     def __repr__(self):
         s = self.start
@@ -82,4 +88,9 @@ if __name__ == '__main__':
     l = LinkedList()
     l.insert_end(1)
     l.insert_end(2)
+    l.insert_start(0)
     print(l)
+    l.delete(1)
+    print(l)
+    x = l.search(1)
+    print(x)
