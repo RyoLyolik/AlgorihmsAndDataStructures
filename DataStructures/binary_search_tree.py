@@ -1,23 +1,8 @@
-class Root:
-    def __init__(self, val):
-        self.value = val
-        self.left: Node = None
-        self.right: Node = None
-
-    def delete(self):
-        if self.left is not None:
-            self.left.deep_delete()
-
-        if self.right:
-            self.right.deep_delete()
-
-    def __repr__(self):
-        return str(self.value)
-
+from queue_ import Queue_
 
 class Node:
-    def __init__(self, val: float):
-        self.parent = None
+    def __init__(self, val: float, parent = None):
+        self.parent = parent
         self.left: Node = None
         self.right: Node = None
         self.value = val
@@ -79,7 +64,7 @@ class Node:
 
 class Tree:
     def __init__(self, val: float):
-        self.root = Root(val)
+        self.root = Node(val)
         self.root.left = None
         self.root.right = None
         self.value = self.root.value
@@ -88,15 +73,13 @@ class Tree:
     def __insertion(node, val):
         if val < node.value:
             if node.left is None:
-                node.left = Node(val)
-                node.left.parent = node
+                node.left = Node(val, parent=node)
                 return None
 
             Tree.__insertion(node.left, val)
             return None
         if node.right is None:
-            node.right = Node(val)
-            node.right.parent = node
+            node.right = Node(val, parent=node)
             return None
 
         Tree.__insertion(node.right, val)
@@ -120,7 +103,7 @@ class Tree:
 
         return node
 
-    def find(self, val) -> [Node, Root]:
+    def find(self, val) -> [Node]:
         node = Tree.__search(self.root, val)
         return node
 
@@ -140,27 +123,64 @@ class Tree:
         return self.root
 
     @staticmethod
-    def __traverse(node):
-        if node is not None:
-            Tree.__traverse(node.left)
-            # print(node)
-            Tree.__traverse(node.right)
+    def __traverse_preorder(node):
+        print(node)
+        if node.left is not None:
+            Tree.__traverse_preorder(node.left)
+        if node.right is not None:
+            Tree.__traverse_preorder(node.right)
 
-    def traverse_tree(self):
-        Tree.__traverse(self.root)
+    def traverse_preorder(self):
+        return Tree.__traverse_preorder(self.root)
+
+    @staticmethod
+    def __traverse_inorder(node):
+        if node.left is not None:
+            Tree.__traverse_inorder(node.left)
+        print(node)
+        if node.right is not None:
+            Tree.__traverse_inorder(node.right)
+
+    def traverse_inorder(self):
+        return Tree.__traverse_inorder(self.root)
+
+    @staticmethod
+    def __traverse_postorder(node):
+        if node.left is not None:
+            Tree.__traverse_postorder(node.left)
+        if node.right is not None:
+            Tree.__traverse_postorder(node.right)
+
+        print(node)
+
+    def traverse_postorder(self):
+        return Tree.__traverse_postorder(self.root)
+
+    def breadth_first_search(self):
+        q = Queue_(self.root)
+
+        while not q.is_empty():
+            node = q.dequeue()
+            yield node
+            if node.left:
+                q.enqueue(node.left)
+            if node.right:
+                q.enqueue(node.right)
+
 
 if __name__ == '__main__':
     import random
-    t = Tree(500)
-    n = 10000000
-    random_list = [int(random.uniform(0.0,1.0)*n) for i in range(n)]
+
+    n = 20
+    t = Tree(n // 2)
+    random_list = [int(random.uniform(0.0, 1.0) * n) for i in range(n)]
     print("Insertion")
     k = 0
     for i in range(n):
-        if (i%100000)==0:
-            k+=1
-            print("Ok", k)
         t.insert(random_list[i])
-    print("Start")
-    t.traverse_tree()
+    print("Traverse")
+    g=t.breadth_first_search()
+    for i in g:
+        print(i)
+
 
